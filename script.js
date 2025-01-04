@@ -1,5 +1,3 @@
-// JavaScript implementation of the website
-
 document.addEventListener("DOMContentLoaded", () => {
     const body = document.body;
 
