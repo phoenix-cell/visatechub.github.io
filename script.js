@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     document.head.appendChild(style);
 
-    // Chatbot functionality
+    // Chatbot functionality with AI API
     const toggleButton = document.getElementById("chatbot-toggle");
     const chatbotWindow = document.getElementById("chatbot-window");
     const closeButton = document.getElementById("chatbot-close");
@@ -203,17 +203,8 @@ document.addEventListener("DOMContentLoaded", () => {
         chatbotWindow.classList.remove("visible");
     });
 
-    // Automated bot responses
-    const botResponses = {
-        "hello": "Hi there! How can I assist you today?",
-        "visa application": "Which type of visa are you applying for: a tourist visa or a student visa?",
-        "tourist visa": "Great! Please mention the country you'd like to visit.",
-        "default": "I'm sorry, I didn't quite understand that. Can you rephrase?"
-    };
-
-    let conversationState = {};
-
-    chatbotSendButton.addEventListener("click", () => {
+    // Handle message sending and API request to AI
+    chatbotSendButton.addEventListener("click", async () => {
         const userMessage = chatbotMessageInput.value.trim().toLowerCase();
 
         if (userMessage) {
@@ -223,36 +214,36 @@ document.addEventListener("DOMContentLoaded", () => {
             userBubble.textContent = userMessage;
             chatbotMessages.appendChild(userBubble);
 
-            let botResponse;
+            // Call AI bot API (e.g., OpenAI)
+            const botResponse = await getAIResponse(userMessage);
 
-            // Handle conversation flow
-            if (conversationState.expectingCountry && userMessage) {
-                conversationState.country = userMessage;
-                botResponse = "Thank you! Please provide your name, contact number, and email address so an agent can call you immediately.";
-                delete conversationState.expectingCountry;
-            } else if (userMessage.includes("visa application")) {
-                botResponse = botResponses["visa application"];
-            } else if (userMessage.includes("tourist visa")) {
-                botResponse = botResponses["tourist visa"];
-                conversationState.expectingCountry = true;
-            } else if (botResponses[userMessage]) {
-                botResponse = botResponses[userMessage];
-            } else {
-                botResponse = botResponses["default"];
-            }
-
-            // Generate bot response
+            // Display bot response
             const botBubble = document.createElement("div");
             botBubble.className = "chatbot-message bot";
             botBubble.textContent = botResponse;
-
-            // Add bot response after a short delay
-            setTimeout(() => {
-                chatbotMessages.appendChild(botBubble);
-                chatbotMessages.scrollTop = chatbotMessages.scrollHeight; // Scroll to the latest message
-            }, 500);
+            chatbotMessages.appendChild(botBubble);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight; // Scroll to latest message
         }
 
         chatbotMessageInput.value = ""; // Clear input field
     });
+
+    // Function to get response from AI API (e.g., OpenAI)
+    async function getAIResponse(userMessage) {
+        const response = await fetch('https://api.openai.com/v1/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer YOUR_OPENAI_API_KEY` // Use your API key
+            },
+            body: JSON.stringify({
+                model: 'text-davinci-003', // or any other available model
+                prompt: userMessage,
+                max_tokens: 150
+            })
+        });
+
+        const data = await response.json();
+        return data.choices[0].text.trim();
+    }
 });
