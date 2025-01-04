@@ -208,10 +208,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Automated bot responses
     const botResponses = {
         "hello": "Hi there! How can I assist you today?",
-        "services": "We offer overseas education consulting, tourist visa assistance, and post-arrival support. Which one would you like to know more about?",
-        "contact": "You can contact us through the form below or email us at support@visatechhub.com.",
+        "visa application": "Which type of visa are you applying for: a tourist visa or a student visa?",
+        "tourist visa": "Great! Please mention the country you'd like to visit.",
         "default": "I'm sorry, I didn't quite understand that. Can you rephrase?"
     };
+
+    let conversationState = {};
 
     chatbotSendButton.addEventListener("click", () => {
         const userMessage = chatbotMessageInput.value.trim().toLowerCase();
@@ -223,8 +225,25 @@ document.addEventListener("DOMContentLoaded", () => {
             userBubble.textContent = userMessage;
             chatbotMessages.appendChild(userBubble);
 
+            let botResponse;
+
+            // Handle conversation flow
+            if (conversationState.expectingCountry && userMessage) {
+                conversationState.country = userMessage;
+                botResponse = "Thank you! Please provide your name, contact number, and email address so an agent can call you immediately.";
+                delete conversationState.expectingCountry;
+            } else if (userMessage.includes("visa application")) {
+                botResponse = botResponses["visa application"];
+            } else if (userMessage.includes("tourist visa")) {
+                botResponse = botResponses["tourist visa"];
+                conversationState.expectingCountry = true;
+            } else if (botResponses[userMessage]) {
+                botResponse = botResponses[userMessage];
+            } else {
+                botResponse = botResponses["default"];
+            }
+
             // Generate bot response
-            const botResponse = botResponses[userMessage] || botResponses["default"];
             const botBubble = document.createElement("div");
             botBubble.className = "chatbot-message bot";
             botBubble.textContent = botResponse;
