@@ -1,3 +1,5 @@
+// Frontend JavaScript for Visa Consultancy Website with AI Chatbot
+
 document.addEventListener("DOMContentLoaded", () => {
     const body = document.body;
 
@@ -29,63 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     body.appendChild(hero);
 
-    // Create Services Section
-    const services = document.createElement("section");
-    services.id = "services";
-    services.innerHTML = `
-        <div class="container">
-            <h2>Our Services</h2>
-            <div class="services-grid">
-                <div class="service">
-                    <h3>Overseas Education Consulting</h3>
-                    <p>Guidance for choosing universities, applying for courses, and visa assistance.</p>
-                </div>
-                <div class="service">
-                    <h3>Tourist Visa Assistance</h3>
-                    <p>End-to-end support for planning your travel and securing tourist visas.</p>
-                </div>
-                <div class="service">
-                    <h3>Post-Arrival Support</h3>
-                    <p>Accommodation, local assistance, and cultural orientation in your destination.</p>
-                </div>
-            </div>
-        </div>
-    `;
-    body.appendChild(services);
-
-    // Create About Section
-    const about = document.createElement("section");
-    about.id = "about";
-    about.innerHTML = `
-        <div class="container">
-            <h2>About Us</h2>
-            <p>At Visa Technology Hub, we are committed to helping you achieve your goals of studying or traveling abroad. With a dedicated team of experts and personalized services, we make the process seamless and hassle-free.</p>
-        </div>
-    `;
-    body.appendChild(about);
-
-    // Create Contact Section
-    const contact = document.createElement("section");
-    contact.id = "contact";
-    contact.innerHTML = `
-        <div class="container">
-            <h2>Contact Us</h2>
-            <form action="/submit" method="post">
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required>
-
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-
-                <label for="message">Message:</label>
-                <textarea id="message" name="message" rows="5" required></textarea>
-
-                <button type="submit">Submit</button>
-            </form>
-        </div>
-    `;
-    body.appendChild(contact);
-
     // Create Chatbot Section
     const chatbot = document.createElement("div");
     chatbot.id = "chatbot";
@@ -105,145 +50,40 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     body.appendChild(chatbot);
 
-    // Add some basic styles
-    const style = document.createElement("style");
-    style.textContent = `
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        header {
-            background: #333;
-            color: #fff;
-            padding: 10px 0;
-        }
-        header ul {
-            list-style: none;
-            display: flex;
-            gap: 15px;
-        }
-        header a {
-            color: #fff;
-            text-decoration: none;
-        }
-        section {
-            padding: 20px 0;
-        }
-        .cta-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #007BFF;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        #chatbot {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-        }
-        #chatbot-window {
-            display: none;
-            position: fixed;
-            bottom: 60px;
-            right: 20px;
-            width: 300px;
-            background: #fff;
-            border: 1px solid #ccc;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        #chatbot-window.visible {
-            display: block;
-        }
-        #chatbot-messages {
-            height: 200px;
-            overflow-y: auto;
-            padding: 10px;
-            background: #f9f9f9;
-            border-bottom: 1px solid #ccc;
-        }
-        .chatbot-message {
-            margin: 5px 0;
-            padding: 8px 12px;
-            border-radius: 8px;
-            max-width: 80%;
-        }
-        .chatbot-message.user {
-            background: #007BFF;
-            color: #fff;
-            align-self: flex-end;
-        }
-        .chatbot-message.bot {
-            background: #e9ecef;
-            color: #333;
-            align-self: flex-start;
-        }
-    `;
-    document.head.appendChild(style);
-
     // Chatbot functionality with AI API
-    const toggleButton = document.getElementById("chatbot-toggle");
     const chatbotWindow = document.getElementById("chatbot-window");
-    const closeButton = document.getElementById("chatbot-close");
     const chatbotMessages = document.getElementById("chatbot-messages");
     const chatbotMessageInput = document.getElementById("chatbot-message");
     const chatbotSendButton = document.getElementById("chatbot-send");
+    document.getElementById("chatbot-toggle").addEventListener("click", () => chatbotWindow.classList.toggle("visible"));
+    document.getElementById("chatbot-close").addEventListener("click", () => chatbotWindow.classList.remove("visible"));
 
-    toggleButton.addEventListener("click", () => {
-        chatbotWindow.classList.toggle("visible");
-    });
-
-    closeButton.addEventListener("click", () => {
-        chatbotWindow.classList.remove("visible");
-    });
-
-    // Handle message sending and API request to AI
     chatbotSendButton.addEventListener("click", async () => {
-        const userMessage = chatbotMessageInput.value.trim().toLowerCase();
+        const userMessage = chatbotMessageInput.value.trim();
+        if (!userMessage) return;
 
-        if (userMessage) {
-            // Display user message
-            const userBubble = document.createElement("div");
-            userBubble.className = "chatbot-message user";
-            userBubble.textContent = userMessage;
-            chatbotMessages.appendChild(userBubble);
+        appendMessage("user", userMessage);
+        chatbotMessageInput.value = "";
 
-            // Call AI bot API (e.g., OpenAI)
-            const botResponse = await getAIResponse(userMessage);
-
-            // Display bot response
-            const botBubble = document.createElement("div");
-            botBubble.className = "chatbot-message bot";
-            botBubble.textContent = botResponse;
-            chatbotMessages.appendChild(botBubble);
-            chatbotMessages.scrollTop = chatbotMessages.scrollHeight; // Scroll to latest message
-        }
-
-        chatbotMessageInput.value = ""; // Clear input field
+        const botResponse = await fetchChatbotResponse(userMessage);
+        appendMessage("bot", botResponse);
     });
 
-    // Function to get response from AI API (e.g., OpenAI)
-    async function getAIResponse(userMessage) {
-        const response = await fetch('https://api.openai.com/v1/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer YOUR_OPENAI_API_KEY` // Use your API key
-            },
-            body: JSON.stringify({
-                model: 'text-davinci-003', // or any other available model
-                prompt: userMessage,
-                max_tokens: 150
-            })
-        });
+    function appendMessage(sender, text) {
+        const messageElement = document.createElement("div");
+        messageElement.className = `chatbot-message ${sender}`;
+        messageElement.textContent = text;
+        chatbotMessages.appendChild(messageElement);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
 
+    async function fetchChatbotResponse(message) {
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+        });
         const data = await response.json();
-        return data.choices[0].text.trim();
+        return data.message || "Sorry, I didn't understand that.";
     }
 });
