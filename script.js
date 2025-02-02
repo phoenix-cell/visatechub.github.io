@@ -58,16 +58,24 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("chatbot-toggle").addEventListener("click", () => chatbotWindow.classList.toggle("visible"));
     document.getElementById("chatbot-close").addEventListener("click", () => chatbotWindow.classList.remove("visible"));
 
-    chatbotSendButton.addEventListener("click", async () => {
+    chatbotSendButton.addEventListener("click", sendMessage);
+    chatbotMessageInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+            sendMessage();
+        }
+    });
+
+    function sendMessage() {
         const userMessage = chatbotMessageInput.value.trim();
         if (!userMessage) return;
 
         appendMessage("user", userMessage);
         chatbotMessageInput.value = "";
 
-        const botResponse = await fetchChatbotResponse(userMessage);
-        appendMessage("bot", botResponse);
-    });
+        fetchChatbotResponse(userMessage).then(botResponse => {
+            appendMessage("bot", botResponse);
+        });
+    }
 
     function appendMessage(sender, text) {
         const messageElement = document.createElement("div");
